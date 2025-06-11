@@ -1,3 +1,4 @@
+import { Role } from "@prisma/client";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 
@@ -20,6 +21,15 @@ export const auth = betterAuth({
     google: {
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+    },
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: [Role.ADMIN, Role.USER],
+        required: true,
+        defaultValue: Role.USER,
+      },
     },
   },
 });
