@@ -1,9 +1,6 @@
 # deps
 node_modules/
 
-# prisma
-/src/generated/prisma
-
 # env
 .env
 .env.*
