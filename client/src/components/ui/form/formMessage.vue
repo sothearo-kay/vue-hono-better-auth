@@ -2,14 +2,14 @@
 import { ErrorMessage } from "vee-validate";
 import { useFormField } from "./useFormField";
 
-const { formMessageId } = useFormField();
+const { name, formMessageId } = useFormField();
 </script>
 
 <template>
   <ErrorMessage
     as="p"
     :id="formMessageId"
-    name="username"
+    :name="name"
     class="text-destructive text-sm font-medium"
   />
 </template>
