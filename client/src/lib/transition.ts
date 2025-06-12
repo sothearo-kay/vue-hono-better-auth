@@ -24,3 +24,12 @@ export const formSwitchTransition = {
   leaveActiveClass: "transition-all duration-200 ease-in",
   leaveToClass: "opacity-0 -translate-x-8 scale-95",
 };
+
+export const flyTransition = {
+  enterFromClass: "opacity-0 -translate-y-2",
+  enterActiveClass: "transition-all duration-300 ease-out",
+  enterToClass: "opacity-100 translate-y-0",
+  leaveFromClass: "opacity-100 translate-y-0",
+  leaveActiveClass: "transition-all duration-200 ease-in",
+  leaveToClass: "opacity-0 -translate-y-2",
+};

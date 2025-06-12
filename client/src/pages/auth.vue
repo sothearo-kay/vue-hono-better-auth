@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { Button } from "@/components/ui/button";
-import { signIn } from "@/lib/auth";
+import type { LoginFormData, SignupFormData } from "@/types/auth";
+
+const router = useRouter();
 
 const isLogin = ref(true);
 const isLoading = ref(false);
@@ -11,12 +12,46 @@ const toggleMode = () => {
   errorMessage.value = "";
 };
 
-const handleError = (message: string) => {
-  errorMessage.value = message;
+const handleLogin = async (values: LoginFormData) => {
+  isLoading.value = true;
+  errorMessage.value = "";
+
+  await signIn.email(values, {
+    onSuccess: () => {
+      router.push("/");
+    },
+    onError: (ctx) => {
+      errorMessage.value = ctx.error.message || "Sign in failed";
+      console.error("Login error:", ctx.error);
+    },
+  });
+
+  isLoading.value = false;
 };
 
-const handleLoading = (loading: boolean) => {
-  isLoading.value = loading;
+const handleSignup = async (values: SignupFormData) => {
+  isLoading.value = true;
+  errorMessage.value = "";
+
+  await signUp.email(
+    {
+      name: values.name,
+      email: values.email,
+      password: values.password,
+      role: "USER",
+    },
+    {
+      onSuccess: () => {
+        router.push("/");
+      },
+      onError: (ctx) => {
+        errorMessage.value = ctx.error.message || "Sign up failed";
+        console.error("Signup error:", ctx.error);
+      },
+    },
+  );
+
+  isLoading.value = false;
 };
 
 const onGoogleAuth = async () => {
@@ -99,38 +134,12 @@ const onGithubAuth = async () => {
           </div>
         </div>
 
-        <!-- Error Message -->
-        <div v-if="errorMessage" class="rounded-md border border-red-200 bg-red-50 p-4">
-          <div class="flex">
-            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-              <path
-                fill-rule="evenodd"
-                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                clip-rule="evenodd"
-              />
-            </svg>
-            <div class="ml-3">
-              <p class="text-sm text-red-700">{{ errorMessage }}</p>
-            </div>
-          </div>
-        </div>
-
         <!-- Auth Form Card -->
         <div class="grid gap-6">
           <!-- Forms -->
           <Transition v-bind="formSwitchTransition" mode="out-in">
-            <LoginForm
-              v-if="isLogin"
-              :is-loading="isLoading"
-              @update:loading="handleLoading"
-              @error="handleError"
-            />
-            <SignupForm
-              v-else
-              :is-loading="isLoading"
-              @update:loading="handleLoading"
-              @error="handleError"
-            />
+            <LoginForm v-if="isLogin" :loading="isLoading" @login="handleLogin" />
+            <SignupForm v-else :loading="isLoading" @signup="handleSignup" />
           </Transition>
 
           <!-- Divider -->
@@ -167,6 +176,24 @@ const onGithubAuth = async () => {
             .
           </p>
         </div>
+
+        <!-- Error Message with Fly Transition -->
+        <Transition v-bind="flyTransition">
+          <div v-if="errorMessage" class="mt-4 rounded-md border border-red-200 bg-red-50 p-4">
+            <div class="flex">
+              <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                <path
+                  fill-rule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clip-rule="evenodd"
+                />
+              </svg>
+              <div class="ml-3">
+                <p class="text-sm text-red-700">{{ errorMessage }}</p>
+              </div>
+            </div>
+          </div>
+        </Transition>
       </div>
     </div>
   </div>

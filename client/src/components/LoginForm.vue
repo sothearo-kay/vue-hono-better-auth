@@ -1,21 +1,19 @@
 <script setup lang="ts">
-import { FormField } from "@/components/ui/form";
+import * as z from "zod";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
-import * as z from "zod";
-
-const router = useRouter();
+import { FormField } from "@/components/ui/form";
+import type { LoginFormData } from "@/types/auth";
 
 interface Props {
-  isLoading: boolean;
+  loading?: boolean;
 }
 
 interface Emits {
-  (e: "update:loading", value: boolean): void;
-  (e: "error", message: string): void;
+  (e: "login", values: LoginFormData): void;
 }
 
-const props = defineProps<Props>();
+const { loading = false } = defineProps<Props>();
 const emit = defineEmits<Emits>();
 
 const loginSchema = toTypedSchema(
@@ -30,27 +28,8 @@ const { handleSubmit, isFieldDirty } = useForm({
   validateOnMount: false,
 });
 
-const onSubmit = handleSubmit(async (values) => {
-  emit("update:loading", true);
-  emit("error", "");
-
-  await signIn.email(
-    {
-      email: values.email,
-      password: values.password,
-    },
-    {
-      onSuccess: () => {
-        router.push("/");
-      },
-      onError: (ctx) => {
-        emit("error", ctx.error.message || "Sign in failed");
-        console.error("Login error:", ctx.error);
-      },
-    },
-  );
-
-  emit("update:loading", false);
+const onSubmit = handleSubmit((values) => {
+  emit("login", values);
 });
 </script>
 
@@ -81,9 +60,9 @@ const onSubmit = handleSubmit(async (values) => {
       </FormItem>
     </FormField>
 
-    <Button type="submit" :disabled="isLoading" class="w-full">
-      <Spinner v-if="isLoading" class="mr-2 -ml-1 h-4 w-4 text-white" />
-      {{ isLoading ? "Signing in..." : "Login" }}
+    <Button type="submit" :disabled="loading" class="w-full">
+      <Spinner v-if="loading" class="mr-2 -ml-1 h-4 w-4 text-white" />
+      {{ loading ? "Signing in..." : "Login" }}
     </Button>
   </form>
 </template>

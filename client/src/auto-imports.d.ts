@@ -16,6 +16,7 @@ declare global {
   const defineComponent: typeof import('vue')['defineComponent']
   const effectScope: typeof import('vue')['effectScope']
   const fadeTransition: typeof import('./lib/transition')['fadeTransition']
+  const flyTransition: typeof import('./lib/transition')['flyTransition']
   const formSwitchTransition: typeof import('./lib/transition')['formSwitchTransition']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentScope: typeof import('vue')['getCurrentScope']
@@ -110,6 +111,7 @@ declare module 'vue' {
     readonly defineComponent: UnwrapRef<typeof import('vue')['defineComponent']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly fadeTransition: UnwrapRef<typeof import('./lib/transition')['fadeTransition']>
+    readonly flyTransition: UnwrapRef<typeof import('./lib/transition')['flyTransition']>
     readonly formSwitchTransition: UnwrapRef<typeof import('./lib/transition')['formSwitchTransition']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
