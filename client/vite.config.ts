@@ -6,6 +6,7 @@ import VueDevTools from "vite-plugin-vue-devtools";
 import VueRouter from "unplugin-vue-router/vite";
 import Layouts from "vite-plugin-vue-layouts";
 import AutoImport from "unplugin-auto-import/vite";
+import Components from "unplugin-vue-components/vite";
 import Tailwindcss from "@tailwindcss/vite";
 import { unheadVueComposablesImports } from "@unhead/vue";
 import { VueRouterAutoImports } from "unplugin-vue-router";
@@ -22,14 +23,22 @@ export default defineConfig({
     VueRouter({
       dts: "src/typed-router.d.ts",
     }),
+
     Layouts(),
+
     AutoImport({
-      include: [/\.vue$/, /\.vue\?vue/],
+      include: [/\.[jt]sx?$/, /\.vue$/, /\.vue\?vue/],
       imports: ["vue", unheadVueComposablesImports, VueRouterAutoImports],
       dts: "src/auto-imports.d.ts",
-      dirs: ["src/composables", "src/stores"],
+      dirs: ["src/composables", "src/stores", "src/lib"],
       vueTemplate: true,
     }),
+
+    Components({
+      include: [/\.vue$/, /\.vue\?vue/],
+      dts: "src/components.d.ts",
+    }),
+
     Vue(),
     VueDevTools(),
     Tailwindcss(),
