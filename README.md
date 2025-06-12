@@ -35,6 +35,7 @@ A full-stack application demonstrating modern authentication with Vue 3, Hono, a
 ## 🛠️ Tech Stack
 
 ### Frontend (Vue)
+
 - **Vue 3.5+** - Composition API with `<script setup>`
 - **TypeScript** - Type safety and better DX
 - **Vite** - Fast build tool and dev server
@@ -46,6 +47,7 @@ A full-stack application demonstrating modern authentication with Vue 3, Hono, a
 - **Better Auth Client** - Authentication client
 
 ### Backend (Hono)
+
 - **Hono** - Lightweight web framework
 - **TypeScript** - Server-side type safety
 - **Prisma** - Database ORM
@@ -55,16 +57,19 @@ A full-stack application demonstrating modern authentication with Vue 3, Hono, a
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - [Bun](https://bun.sh/) (recommended) or Node.js 18+
 - Database (PostgreSQL, MySQL, or SQLite)
 
 ### 1. Clone the repository
+
 ```bash
-git clone <repository-url>
+git clone https://github.com/sothearo-kay/vue-hono-better-auth.git
 cd vue-hono-better-auth
 ```
 
 ### 2. Server Setup
+
 ```bash
 cd server
 bun install
@@ -76,23 +81,40 @@ cp .env.example .env
 # Generate Prisma client and run migrations
 bunx prisma generate
 bunx prisma db push
-
-# Start development server
-bun dev
 ```
 
-### 3. Client Setup
+### 3. Development Mode
+
+**Option A: Separate Dev Servers (Recommended for development)**
+
 ```bash
+# Terminal 1 - Start client dev server
 cd client
 bun install
+bun dev          # Runs on http://localhost:5173
 
-# Start development server
-bun dev
+# Terminal 2 - Start server dev server
+cd server
+bun dev          # Runs on http://localhost:3000
+```
+
+**Option B: Single Server (Production-like)**
+
+```bash
+# Build client first
+cd client
+bun install
+bun run build    # Creates client/dist/ with static files
+
+# Start server (serves both API and built client)
+cd server
+bun dev          # Serves everything on http://localhost:3000
 ```
 
 ### 4. Environment Variables
 
 **Server (.env)**
+
 ```env
 DATABASE_URL="your-database-connection-string"
 BETTER_AUTH_SECRET="your-secret-key"
@@ -108,6 +130,7 @@ GITHUB_CLIENT_SECRET="your-github-client-secret"
 ### Available Scripts
 
 **Client:**
+
 ```bash
 bun dev          # Start development server
 bun build        # Build for production
@@ -118,13 +141,32 @@ bun type-check   # TypeScript type checking
 ```
 
 **Server:**
+
 ```bash
 bun dev          # Start development server with hot reload
 bunx prisma studio    # Open Prisma Studio
 bunx prisma generate  # Regenerate Prisma client
 ```
 
+### Static File Serving
+
+The server can serve the built Vue client alongside the API:
+
+1. **Build the client**: `cd client && bun run build`
+2. **Server configuration**:
+
+   ```js
+   // Serve static files (JS, CSS, assets)
+   app.use("*", serveStatic({ root: "../client/dist" }));
+
+   // SPA fallback for Vue Router
+   app.get("*", serveStatic({ path: "index.html", root: "../client/dist" }));
+   ```
+
+3. **Single endpoint**: Server handles both `/api/*` and all client routes
+
 ### Code Style
+
 - **ESLint + Prettier** - Code formatting and linting
 - **TypeScript strict mode** - Enhanced type checking
 - **Conventional commits** - Standardized commit messages
@@ -147,6 +189,7 @@ bunx prisma generate  # Regenerate Prisma client
 ## 📦 Key Dependencies
 
 ### Client
+
 - `vue` - Vue 3 framework
 - `better-auth` - Authentication client
 - `vee-validate` + `zod` - Form validation
@@ -156,6 +199,7 @@ bunx prisma generate  # Regenerate Prisma client
 - `pinia` - State management
 
 ### Server
+
 - `hono` - Web framework
 - `better-auth` - Authentication server
 - `@prisma/client` - Database client
@@ -163,19 +207,44 @@ bunx prisma generate  # Regenerate Prisma client
 
 ## 🚀 Deployment
 
-### Client (Static Site)
-Build and deploy to any static hosting service:
+### Single Server Deployment (Recommended)
+
+The server can serve both the API and the built Vue client:
+
+```bash
+# 1. Build the client
+cd client
+bun run build    # Creates client/dist/ with static files
+
+# 2. Deploy the server (which serves both API and client)
+cd server
+bun run start    # Or deploy to Railway, Render, etc.
+```
+
+The server serves:
+
+- **API routes**: `/api/*` (authentication, data)
+- **Static files**: JS, CSS, images from `client/dist/`
+- **SPA fallback**: All other routes serve `index.html` for Vue Router
+
+### Separate Deployment (Alternative)
+
+Deploy client and server separately:
+
+**Client (Static Site)**:
+
 ```bash
 cd client
 bun build
 # Deploy dist/ folder to Vercel, Netlify, etc.
 ```
 
-### Server (Node.js/Bun)
-Deploy to any Node.js hosting service:
+**Server (API Only)**:
+
 ```bash
 cd server
 # Deploy to Railway, Render, etc.
+# Update CORS settings for your client domain
 ```
 
 ## 🤝 Contributing
@@ -189,3 +258,4 @@ cd server
 ## 📄 License
 
 This project is licensed under the MIT License.
+
