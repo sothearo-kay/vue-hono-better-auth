@@ -3,8 +3,13 @@ import { FormField } from "@/components/ui/form";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
 import * as z from "zod";
+import { signIn, signUp } from "@/lib/auth";
+import { useRouter } from "vue-router";
 
 const isLogin = ref(true);
+const router = useRouter();
+const isLoading = ref(false);
+const errorMessage = ref("");
 
 const loginSchema = toTypedSchema(
   z.object({
@@ -37,27 +42,85 @@ const { handleSubmit: handleSignupSubmit, resetForm: resetSignupForm } = useForm
   validateOnMount: false,
 });
 
-const onLoginSubmit = handleLoginSubmit((values) => {
-  console.log("Login:", values);
+const onLoginSubmit = handleLoginSubmit(async (values) => {
+  try {
+    isLoading.value = true;
+    errorMessage.value = "";
+    
+    const result = await signIn.email({
+      email: values.email,
+      password: values.password,
+    });
+
+    if (result.error) {
+      errorMessage.value = result.error.message || "Sign in failed";
+    } else {
+      // Redirect to dashboard or home page after successful login
+      router.push("/");
+    }
+  } catch (error) {
+    errorMessage.value = "An unexpected error occurred";
+    console.error("Login error:", error);
+  } finally {
+    isLoading.value = false;
+  }
 });
 
-const onSignupSubmit = handleSignupSubmit((values) => {
-  console.log("Signup:", values);
+const onSignupSubmit = handleSignupSubmit(async (values) => {
+  try {
+    isLoading.value = true;
+    errorMessage.value = "";
+    
+    const result = await signUp.email({
+      name: values.name,
+      email: values.email,
+      password: values.password,
+    });
+
+    if (result.error) {
+      errorMessage.value = result.error.message || "Sign up failed";
+    } else {
+      // Redirect to dashboard or home page after successful signup
+      router.push("/");
+    }
+  } catch (error) {
+    errorMessage.value = "An unexpected error occurred";
+    console.error("Signup error:", error);
+  } finally {
+    isLoading.value = false;
+  }
 });
 
 const toggleMode = async () => {
   isLogin.value = !isLogin.value;
+  errorMessage.value = "";
   await nextTick();
   resetLoginForm();
   resetSignupForm();
 };
 
-const onGoogleAuth = () => {
-  console.log("Google OAuth");
+const onGoogleAuth = async () => {
+  try {
+    await signIn.social({
+      provider: "google",
+      callbackURL: "/",
+    });
+  } catch (error) {
+    errorMessage.value = "Google authentication failed";
+    console.error("Google auth error:", error);
+  }
 };
 
-const onGithubAuth = () => {
-  console.log("GitHub OAuth");
+const onGithubAuth = async () => {
+  try {
+    await signIn.social({
+      provider: "github", 
+      callbackURL: "/",
+    });
+  } catch (error) {
+    errorMessage.value = "GitHub authentication failed";
+    console.error("GitHub auth error:", error);
+  }
 };
 </script>
 
@@ -116,6 +179,18 @@ const onGithubAuth = () => {
           </div>
         </div>
 
+        <!-- Error Message -->
+        <div v-if="errorMessage" class="rounded-md bg-red-50 border border-red-200 p-4">
+          <div class="flex">
+            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+            </svg>
+            <div class="ml-3">
+              <p class="text-sm text-red-700">{{ errorMessage }}</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Auth Form Card -->
         <div class="grid gap-6">
           <!-- Login Form -->
@@ -153,9 +228,14 @@ const onGithubAuth = () => {
 
               <Button
                 type="submit"
-                class="w-full rounded-md bg-black px-4 py-2 text-white hover:bg-gray-900 focus:ring-2 focus:ring-black focus:ring-offset-2 focus:outline-none"
+                :disabled="isLoading"
+                class="w-full rounded-md bg-black px-4 py-2 text-white hover:bg-gray-900 focus:ring-2 focus:ring-black focus:ring-offset-2 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Login
+                <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {{ isLoading ? "Signing in..." : "Login" }}
               </Button>
             </form>
 
@@ -225,9 +305,14 @@ const onGithubAuth = () => {
 
               <Button
                 type="submit"
-                class="w-full rounded-md bg-black px-4 py-2 text-white hover:bg-gray-900 focus:ring-2 focus:ring-black focus:ring-offset-2 focus:outline-none"
+                :disabled="isLoading"
+                class="w-full rounded-md bg-black px-4 py-2 text-white hover:bg-gray-900 focus:ring-2 focus:ring-black focus:ring-offset-2 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Create Account
+                <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {{ isLoading ? "Creating account..." : "Create Account" }}
               </Button>
             </form>
           </Transition>
@@ -247,7 +332,8 @@ const onGithubAuth = () => {
             <Button
               variant="outline"
               type="button"
-              class="w-full border-gray-300 text-gray-700 hover:bg-gray-50"
+              :disabled="isLoading"
+              class="w-full border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               @click="onGithubAuth"
             >
               <svg class="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
@@ -263,7 +349,8 @@ const onGithubAuth = () => {
             <Button
               variant="outline"
               type="button"
-              class="w-full border-gray-300 text-gray-700 hover:bg-gray-50"
+              :disabled="isLoading"
+              class="w-full border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
               @click="onGoogleAuth"
             >
               <svg class="mr-2 h-4 w-4" viewBox="0 0 24 24">
