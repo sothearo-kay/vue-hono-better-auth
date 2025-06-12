@@ -1,0 +1,191 @@
+# Vue + Hono + Better Auth
+
+A full-stack application demonstrating modern authentication with Vue 3, Hono, and Better Auth.
+
+## 🚀 Features
+
+- **Frontend**: Vue 3 with TypeScript, Vite, and Tailwind CSS
+- **Backend**: Hono with TypeScript and Prisma
+- **Authentication**: Better Auth with email/password and OAuth (Google, GitHub)
+- **UI Components**: Reka UI with custom form components
+- **Validation**: Vee-Validate with Zod schemas
+- **Styling**: Tailwind CSS with custom transitions
+- **Type Safety**: Full TypeScript support across frontend and backend
+
+## 📁 Project Structure
+
+```
+├── client/                 # Vue 3 frontend
+│   ├── src/
+│   │   ├── components/     # Reusable Vue components
+│   │   ├── pages/          # Route pages
+│   │   ├── lib/            # Utilities and configurations
+│   │   ├── types/          # TypeScript type definitions
+│   │   └── stores/         # Pinia state management
+│   └── ...
+├── server/                 # Hono backend
+│   ├── src/
+│   │   ├── routes/         # API route handlers
+│   │   ├── lib/            # Server utilities and configurations
+│   │   └── ...
+│   └── prisma/             # Database schema and migrations
+└── README.md
+```
+
+## 🛠️ Tech Stack
+
+### Frontend (Vue)
+- **Vue 3.5+** - Composition API with `<script setup>`
+- **TypeScript** - Type safety and better DX
+- **Vite** - Fast build tool and dev server
+- **Vue Router** - Client-side routing
+- **Pinia** - State management
+- **Tailwind CSS** - Utility-first styling
+- **Reka UI** - Headless UI components
+- **Vee-Validate + Zod** - Form validation
+- **Better Auth Client** - Authentication client
+
+### Backend (Hono)
+- **Hono** - Lightweight web framework
+- **TypeScript** - Server-side type safety
+- **Prisma** - Database ORM
+- **Better Auth** - Authentication server
+- **Bun** - Fast JavaScript runtime
+
+## 🚀 Quick Start
+
+### Prerequisites
+- [Bun](https://bun.sh/) (recommended) or Node.js 18+
+- Database (PostgreSQL, MySQL, or SQLite)
+
+### 1. Clone the repository
+```bash
+git clone <repository-url>
+cd vue-hono-better-auth
+```
+
+### 2. Server Setup
+```bash
+cd server
+bun install
+
+# Configure your database in prisma/schema.prisma
+# Create .env file with database connection
+cp .env.example .env
+
+# Generate Prisma client and run migrations
+bunx prisma generate
+bunx prisma db push
+
+# Start development server
+bun dev
+```
+
+### 3. Client Setup
+```bash
+cd client
+bun install
+
+# Start development server
+bun dev
+```
+
+### 4. Environment Variables
+
+**Server (.env)**
+```env
+DATABASE_URL="your-database-connection-string"
+BETTER_AUTH_SECRET="your-secret-key"
+BETTER_AUTH_URL="http://localhost:3000"
+GOOGLE_CLIENT_ID="your-google-client-id"
+GOOGLE_CLIENT_SECRET="your-google-client-secret"
+GITHUB_CLIENT_ID="your-github-client-id"
+GITHUB_CLIENT_SECRET="your-github-client-secret"
+```
+
+## 🎯 Development
+
+### Available Scripts
+
+**Client:**
+```bash
+bun dev          # Start development server
+bun build        # Build for production
+bun preview      # Preview production build
+bun test:unit    # Run unit tests
+bun lint         # Lint and fix code
+bun type-check   # TypeScript type checking
+```
+
+**Server:**
+```bash
+bun dev          # Start development server with hot reload
+bunx prisma studio    # Open Prisma Studio
+bunx prisma generate  # Regenerate Prisma client
+```
+
+### Code Style
+- **ESLint + Prettier** - Code formatting and linting
+- **TypeScript strict mode** - Enhanced type checking
+- **Conventional commits** - Standardized commit messages
+
+## 🔐 Authentication Flow
+
+1. **Email/Password**: Traditional registration and login
+2. **OAuth Providers**: Google and GitHub integration
+3. **Session Management**: Better Auth handles sessions automatically
+4. **Route Protection**: Client-side route guards
+5. **Type-Safe API**: Shared types between client and server
+
+## 🎨 UI Components
+
+- **Form Components**: LoginForm, SignupForm with validation
+- **UI Library**: Custom components built with Reka UI
+- **Transitions**: Smooth animations for better UX
+- **Responsive Design**: Mobile-first approach
+
+## 📦 Key Dependencies
+
+### Client
+- `vue` - Vue 3 framework
+- `better-auth` - Authentication client
+- `vee-validate` + `zod` - Form validation
+- `reka-ui` - Headless UI components
+- `tailwindcss` - CSS framework
+- `vue-router` - Routing
+- `pinia` - State management
+
+### Server
+- `hono` - Web framework
+- `better-auth` - Authentication server
+- `@prisma/client` - Database client
+- `prisma` - Database toolkit
+
+## 🚀 Deployment
+
+### Client (Static Site)
+Build and deploy to any static hosting service:
+```bash
+cd client
+bun build
+# Deploy dist/ folder to Vercel, Netlify, etc.
+```
+
+### Server (Node.js/Bun)
+Deploy to any Node.js hosting service:
+```bash
+cd server
+# Deploy to Railway, Render, etc.
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License.
