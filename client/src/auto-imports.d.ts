@@ -15,6 +15,8 @@ declare global {
   const defineAsyncComponent: typeof import('vue')['defineAsyncComponent']
   const defineComponent: typeof import('vue')['defineComponent']
   const effectScope: typeof import('vue')['effectScope']
+  const fadeTransition: typeof import('./lib/transition')['fadeTransition']
+  const formSwitchTransition: typeof import('./lib/transition')['formSwitchTransition']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentScope: typeof import('vue')['getCurrentScope']
   const getSession: typeof import('./lib/auth')['getSession']
@@ -54,6 +56,7 @@ declare global {
   const signIn: typeof import('./lib/auth')['signIn']
   const signOut: typeof import('./lib/auth')['signOut']
   const signUp: typeof import('./lib/auth')['signUp']
+  const slideTransition: typeof import('./lib/transition')['slideTransition']
   const toRaw: typeof import('vue')['toRaw']
   const toRef: typeof import('vue')['toRef']
   const toRefs: typeof import('vue')['toRefs']
@@ -106,6 +109,8 @@ declare module 'vue' {
     readonly defineAsyncComponent: UnwrapRef<typeof import('vue')['defineAsyncComponent']>
     readonly defineComponent: UnwrapRef<typeof import('vue')['defineComponent']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
+    readonly fadeTransition: UnwrapRef<typeof import('./lib/transition')['fadeTransition']>
+    readonly formSwitchTransition: UnwrapRef<typeof import('./lib/transition')['formSwitchTransition']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
     readonly getSession: UnwrapRef<typeof import('./lib/auth')['getSession']>
@@ -145,6 +150,7 @@ declare module 'vue' {
     readonly signIn: UnwrapRef<typeof import('./lib/auth')['signIn']>
     readonly signOut: UnwrapRef<typeof import('./lib/auth')['signOut']>
     readonly signUp: UnwrapRef<typeof import('./lib/auth')['signUp']>
+    readonly slideTransition: UnwrapRef<typeof import('./lib/transition')['slideTransition']>
     readonly toRaw: UnwrapRef<typeof import('vue')['toRaw']>
     readonly toRef: UnwrapRef<typeof import('vue')['toRef']>
     readonly toRefs: UnwrapRef<typeof import('vue')['toRefs']>
