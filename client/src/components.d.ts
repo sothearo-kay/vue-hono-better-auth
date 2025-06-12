@@ -14,11 +14,14 @@ declare module 'vue' {
     FormItem: typeof import('./components/ui/form/formItem.vue')['default']
     FormLabel: typeof import('./components/ui/form/formLabel.vue')['default']
     FormMessage: typeof import('./components/ui/form/formMessage.vue')['default']
+    GitHub: typeof import('./components/ui/icon/GitHub.vue')['default']
+    Google: typeof import('./components/ui/icon/Google.vue')['default']
     Input: typeof import('./components/ui/input/input.vue')['default']
     Label: typeof import('./components/ui/label/label.vue')['default']
     LoginForm: typeof import('./components/LoginForm.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SignupForm: typeof import('./components/SignupForm.vue')['default']
+    Spinner: typeof import('./components/ui/icon/Spinner.vue')['default']
   }
 }

@@ -1,11 +1,7 @@
 <script setup lang="ts">
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { FormField } from "@/components/ui/form";
 import { toTypedSchema } from "@vee-validate/zod";
 import { useForm } from "vee-validate";
-import { signUp } from "@/lib/auth";
-import { useRouter } from "vue-router";
 import * as z from "zod";
 
 const router = useRouter();
@@ -15,8 +11,8 @@ interface Props {
 }
 
 interface Emits {
-  (e: 'update:loading', value: boolean): void;
-  (e: 'error', message: string): void;
+  (e: "update:loading", value: boolean): void;
+  (e: "error", message: string): void;
 }
 
 const props = defineProps<Props>();
@@ -36,69 +32,60 @@ const signupSchema = toTypedSchema(
     }),
 );
 
-const { handleSubmit } = useForm({
+const { handleSubmit, isFieldDirty } = useForm({
   validationSchema: signupSchema,
   validateOnMount: false,
 });
 
 const onSubmit = handleSubmit(async (values) => {
-  try {
-    emit('update:loading', true);
-    emit('error', "");
-    
-    const result = await signUp.email({
+  emit("update:loading", true);
+  emit("error", "");
+
+  await signUp.email(
+    {
       name: values.name,
       email: values.email,
       password: values.password,
-    });
+      role: "USER",
+    },
+    {
+      onSuccess: () => {
+        router.push("/");
+      },
+      onError: (ctx) => {
+        emit("error", ctx.error.message || "Sign up failed");
+        console.error("Signup error:", ctx.error);
+      },
+    },
+  );
 
-    if (result.error) {
-      emit('error', result.error.message || "Sign up failed");
-    } else {
-      router.push("/");
-    }
-  } catch (error) {
-    emit('error', "An unexpected error occurred");
-    console.error("Signup error:", error);
-  } finally {
-    emit('update:loading', false);
-  }
+  emit("update:loading", false);
 });
 </script>
 
 <template>
   <form class="space-y-4" @submit.prevent="onSubmit">
-    <FormField v-slot="{ componentField }" name="name">
+    <FormField v-slot="{ componentField }" name="name" :validate-on-blur="!isFieldDirty">
       <FormItem>
         <FormLabel>Full Name</FormLabel>
         <FormControl>
-          <Input
-            type="text"
-            placeholder="John Doe"
-            class="mt-1"
-            v-bind="componentField"
-          />
+          <Input type="text" placeholder="John Doe" class="mt-1" v-bind="componentField" />
         </FormControl>
         <FormMessage />
       </FormItem>
     </FormField>
 
-    <FormField v-slot="{ componentField }" name="email">
+    <FormField v-slot="{ componentField }" name="email" :validate-on-blur="!isFieldDirty">
       <FormItem>
         <FormLabel>Email</FormLabel>
         <FormControl>
-          <Input
-            type="email"
-            placeholder="m@example.com"
-            class="mt-1"
-            v-bind="componentField"
-          />
+          <Input type="email" placeholder="m@example.com" class="mt-1" v-bind="componentField" />
         </FormControl>
         <FormMessage />
       </FormItem>
     </FormField>
 
-    <FormField v-slot="{ componentField }" name="password">
+    <FormField v-slot="{ componentField }" name="password" :validate-on-blur="!isFieldDirty">
       <FormItem>
         <FormLabel>Password</FormLabel>
         <FormControl>
@@ -113,7 +100,7 @@ const onSubmit = handleSubmit(async (values) => {
       </FormItem>
     </FormField>
 
-    <FormField v-slot="{ componentField }" name="confirmPassword">
+    <FormField v-slot="{ componentField }" name="confirmPassword" :validate-on-blur="!isFieldDirty">
       <FormItem>
         <FormLabel>Confirm Password</FormLabel>
         <FormControl>
