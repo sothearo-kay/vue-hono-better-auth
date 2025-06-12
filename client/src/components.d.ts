@@ -16,7 +16,9 @@ declare module 'vue' {
     FormMessage: typeof import('./components/ui/form/formMessage.vue')['default']
     Input: typeof import('./components/ui/input/input.vue')['default']
     Label: typeof import('./components/ui/label/label.vue')['default']
+    LoginForm: typeof import('./components/LoginForm.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SignupForm: typeof import('./components/SignupForm.vue')['default']
   }
 }

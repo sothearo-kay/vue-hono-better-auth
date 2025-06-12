@@ -1,102 +1,22 @@
 <script setup lang="ts">
-import { FormField } from "@/components/ui/form";
-import { toTypedSchema } from "@vee-validate/zod";
-import { useForm } from "vee-validate";
-import * as z from "zod";
-import { signIn, signUp } from "@/lib/auth";
-import { useRouter } from "vue-router";
+import { Button } from "@/components/ui/button";
+import { signIn } from "@/lib/auth";
 
 const isLogin = ref(true);
-const router = useRouter();
 const isLoading = ref(false);
 const errorMessage = ref("");
 
-const loginSchema = toTypedSchema(
-  z.object({
-    email: z.string().email("Please enter a valid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
-  }),
-);
-
-const signupSchema = toTypedSchema(
-  z
-    .object({
-      name: z.string().min(2, "Name must be at least 2 characters"),
-      email: z.string().email("Please enter a valid email address"),
-      password: z.string().min(6, "Password must be at least 6 characters"),
-      confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: "Passwords don't match",
-      path: ["confirmPassword"],
-    }),
-);
-
-const { handleSubmit: handleLoginSubmit, resetForm: resetLoginForm } = useForm({
-  validationSchema: loginSchema,
-  validateOnMount: false,
-});
-
-const { handleSubmit: handleSignupSubmit, resetForm: resetSignupForm } = useForm({
-  validationSchema: signupSchema,
-  validateOnMount: false,
-});
-
-const onLoginSubmit = handleLoginSubmit(async (values) => {
-  try {
-    isLoading.value = true;
-    errorMessage.value = "";
-    
-    const result = await signIn.email({
-      email: values.email,
-      password: values.password,
-    });
-
-    if (result.error) {
-      errorMessage.value = result.error.message || "Sign in failed";
-    } else {
-      // Redirect to dashboard or home page after successful login
-      router.push("/");
-    }
-  } catch (error) {
-    errorMessage.value = "An unexpected error occurred";
-    console.error("Login error:", error);
-  } finally {
-    isLoading.value = false;
-  }
-});
-
-const onSignupSubmit = handleSignupSubmit(async (values) => {
-  try {
-    isLoading.value = true;
-    errorMessage.value = "";
-    
-    const result = await signUp.email({
-      name: values.name,
-      email: values.email,
-      password: values.password,
-    });
-
-    if (result.error) {
-      errorMessage.value = result.error.message || "Sign up failed";
-    } else {
-      // Redirect to dashboard or home page after successful signup
-      router.push("/");
-    }
-  } catch (error) {
-    errorMessage.value = "An unexpected error occurred";
-    console.error("Signup error:", error);
-  } finally {
-    isLoading.value = false;
-  }
-});
-
-const toggleMode = async () => {
+const toggleMode = () => {
   isLogin.value = !isLogin.value;
   errorMessage.value = "";
-  await nextTick();
-  resetLoginForm();
-  resetSignupForm();
+};
+
+const handleError = (message: string) => {
+  errorMessage.value = message;
+};
+
+const handleLoading = (loading: boolean) => {
+  isLoading.value = loading;
 };
 
 const onGoogleAuth = async () => {
@@ -114,7 +34,7 @@ const onGoogleAuth = async () => {
 const onGithubAuth = async () => {
   try {
     await signIn.social({
-      provider: "github", 
+      provider: "github",
       callbackURL: "/",
     });
   } catch (error) {
@@ -126,7 +46,7 @@ const onGithubAuth = async () => {
 
 <template>
   <div
-    class="relative container h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0"
+    class="relative h-screen flex-col items-center justify-center md:grid lg:max-w-none lg:grid-cols-2 lg:px-0"
   >
     <!-- Left Column - Hero/Branding -->
     <div class="relative hidden h-full flex-col p-10 text-white lg:flex">
@@ -180,10 +100,14 @@ const onGithubAuth = async () => {
         </div>
 
         <!-- Error Message -->
-        <div v-if="errorMessage" class="rounded-md bg-red-50 border border-red-200 p-4">
+        <div v-if="errorMessage" class="rounded-md border border-red-200 bg-red-50 p-4">
           <div class="flex">
             <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              <path
+                fill-rule="evenodd"
+                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                clip-rule="evenodd"
+              />
             </svg>
             <div class="ml-3">
               <p class="text-sm text-red-700">{{ errorMessage }}</p>
@@ -193,128 +117,20 @@ const onGithubAuth = async () => {
 
         <!-- Auth Form Card -->
         <div class="grid gap-6">
-          <!-- Login Form -->
+          <!-- Forms -->
           <Transition v-bind="formSwitchTransition" mode="out-in">
-            <form v-if="isLogin" key="login" class="space-y-4" @submit="onLoginSubmit">
-              <FormField v-slot="{ componentField }" name="email">
-                <FormItem>
-                  <FormLabel class="text-sm font-medium text-gray-700"> Email </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="m@example.com"
-                      class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
-                      v-bind="componentField"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-
-              <FormField v-slot="{ componentField }" name="password">
-                <FormItem>
-                  <FormLabel class="text-sm font-medium text-gray-700"> Password </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Enter your password"
-                      class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
-                      v-bind="componentField"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-
-              <Button
-                type="submit"
-                :disabled="isLoading"
-                class="w-full rounded-md bg-black px-4 py-2 text-white hover:bg-gray-900 focus:ring-2 focus:ring-black focus:ring-offset-2 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {{ isLoading ? "Signing in..." : "Login" }}
-              </Button>
-            </form>
-
-            <!-- Signup Form -->
-            <form v-else key="signup" class="space-y-4" @submit="onSignupSubmit">
-              <FormField v-slot="{ componentField }" name="name">
-                <FormItem>
-                  <FormLabel class="text-sm font-medium text-gray-700"> Full Name </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="text"
-                      placeholder="John Doe"
-                      class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
-                      v-bind="componentField"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-
-              <FormField v-slot="{ componentField }" name="email">
-                <FormItem>
-                  <FormLabel class="text-sm font-medium text-gray-700"> Email </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="email"
-                      placeholder="m@example.com"
-                      class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
-                      v-bind="componentField"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-
-              <FormField v-slot="{ componentField }" name="password">
-                <FormItem>
-                  <FormLabel class="text-sm font-medium text-gray-700"> Password </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Create a password"
-                      class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
-                      v-bind="componentField"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-
-              <FormField v-slot="{ componentField }" name="confirmPassword">
-                <FormItem>
-                  <FormLabel class="text-sm font-medium text-gray-700">
-                    Confirm Password
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      placeholder="Confirm your password"
-                      class="mt-1 block w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm placeholder-gray-400 focus:border-black focus:ring-1 focus:ring-black focus:outline-none"
-                      v-bind="componentField"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
-
-              <Button
-                type="submit"
-                :disabled="isLoading"
-                class="w-full rounded-md bg-black px-4 py-2 text-white hover:bg-gray-900 focus:ring-2 focus:ring-black focus:ring-offset-2 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg v-if="isLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {{ isLoading ? "Creating account..." : "Create Account" }}
-              </Button>
-            </form>
+            <LoginForm
+              v-if="isLogin"
+              :is-loading="isLoading"
+              @update:loading="handleLoading"
+              @error="handleError"
+            />
+            <SignupForm
+              v-else
+              :is-loading="isLoading"
+              @update:loading="handleLoading"
+              @error="handleError"
+            />
           </Transition>
 
           <!-- Divider -->
@@ -329,13 +145,7 @@ const onGithubAuth = async () => {
 
           <!-- OAuth Buttons -->
           <div class="grid grid-cols-2 gap-4">
-            <Button
-              variant="outline"
-              type="button"
-              :disabled="isLoading"
-              class="w-full border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              @click="onGithubAuth"
-            >
+            <Button variant="outline" type="button" :disabled="isLoading" @click="onGithubAuth">
               <svg class="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
                 <path
                   fill-rule="evenodd"
@@ -346,13 +156,7 @@ const onGithubAuth = async () => {
               Continue with GitHub
             </Button>
 
-            <Button
-              variant="outline"
-              type="button"
-              :disabled="isLoading"
-              class="w-full border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-              @click="onGoogleAuth"
-            >
+            <Button variant="outline" type="button" :disabled="isLoading" @click="onGoogleAuth">
               <svg class="mr-2 h-4 w-4" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
