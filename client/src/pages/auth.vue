@@ -58,7 +58,7 @@ const onGoogleAuth = async () => {
   try {
     await signIn.social({
       provider: "google",
-      callbackURL: "/",
+      callbackURL: import.meta.env.VITE_CALLBACK_URL,
     });
   } catch (error) {
     errorMessage.value = "Google authentication failed";
@@ -70,7 +70,7 @@ const onGithubAuth = async () => {
   try {
     await signIn.social({
       provider: "github",
-      callbackURL: "/",
+      callbackURL: import.meta.env.VITE_CALLBACK_URL,
     });
   } catch (error) {
     errorMessage.value = "GitHub authentication failed";
