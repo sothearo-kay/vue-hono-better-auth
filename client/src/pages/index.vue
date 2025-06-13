@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { signOut, useSession } from "@/lib/auth";
+import { toast } from "vue-sonner";
 
 const router = useRouter();
 const { data: session } = useSession();
@@ -8,18 +9,21 @@ const isLoading = ref(false);
 const handleLogout = async () => {
   isLoading.value = true;
   
-  await signOut({
-    fetchOptions: {
-      onSuccess: () => {
-        router.push("/auth");
+  try {
+    await signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/auth");
+        },
+        onError: (context) => {
+          console.error("Logout error:", context.error);
+          toast.error("Failed to logout. Please try again.");
+        },
       },
-      onError: (context) => {
-        console.error("Logout error:", context.error);
-      },
-    },
-  });
-  
-  isLoading.value = false;
+    });
+  } finally {
+    isLoading.value = false;
+  }
 };
 </script>
 
