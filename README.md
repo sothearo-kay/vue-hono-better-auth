@@ -125,6 +125,12 @@ GITHUB_CLIENT_ID="your-github-client-id"
 GITHUB_CLIENT_SECRET="your-github-client-secret"
 ```
 
+**Client (.env)**
+
+```env
+VITE_BASE_URL=http://localhost:5173
+```
+
 ## 🎯 Development
 
 ### Available Scripts
