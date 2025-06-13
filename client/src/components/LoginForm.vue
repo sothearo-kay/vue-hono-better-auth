@@ -19,7 +19,7 @@ const emit = defineEmits<Emits>();
 const loginSchema = toTypedSchema(
   z.object({
     email: z.string().email("Please enter a valid email address"),
-    password: z.string().min(6, "Password must be at least 6 characters"),
+    password: z.string().min(8, "Password must be at least 8 characters"),
   }),
 );
 

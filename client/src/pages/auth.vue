@@ -179,7 +179,7 @@ const onGithubAuth = async () => {
 
         <!-- Error Message with Fly Transition -->
         <Transition v-bind="flyTransition">
-          <div v-if="errorMessage" class="mt-4 rounded-md border border-red-200 bg-red-50 p-4">
+          <div v-if="errorMessage" class="rounded-md border border-red-200 bg-red-50 p-4">
             <div class="flex">
               <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
                 <path
