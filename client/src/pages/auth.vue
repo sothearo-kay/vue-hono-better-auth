@@ -18,7 +18,7 @@ const handleLogin = async (values: LoginFormData) => {
 
   await signIn.email(values, {
     onSuccess: () => {
-      router.push("/");
+      router.push(import.meta.env.VITE_BASE_URL);
     },
     onError: (ctx) => {
       errorMessage.value = ctx.error.message || "Sign in failed";
@@ -42,7 +42,7 @@ const handleSignup = async (values: SignupFormData) => {
     },
     {
       onSuccess: () => {
-        router.push("/");
+        router.push(import.meta.env.VITE_BASE_URL);
       },
       onError: (ctx) => {
         errorMessage.value = ctx.error.message || "Sign up failed";
@@ -58,7 +58,7 @@ const onGoogleAuth = async () => {
   try {
     await signIn.social({
       provider: "google",
-      callbackURL: import.meta.env.VITE_CALLBACK_URL,
+      callbackURL: import.meta.env.VITE_BASE_URL,
     });
   } catch (error) {
     errorMessage.value = "Google authentication failed";
@@ -70,7 +70,7 @@ const onGithubAuth = async () => {
   try {
     await signIn.social({
       provider: "github",
-      callbackURL: import.meta.env.VITE_CALLBACK_URL,
+      callbackURL: import.meta.env.VITE_BASE_URL,
     });
   } catch (error) {
     errorMessage.value = "GitHub authentication failed";
